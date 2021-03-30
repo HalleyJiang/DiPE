@@ -82,14 +82,14 @@ The pretrained models of our paper is available on [BaiduDisk](https://pan.baidu
 #### Eigen Split
 
 ```
-python train.py  evaluate_kitti.py --data_path $DATA_PATH(raw_data) --load_weights_folder $MODEL_PATH(dipe_eigen) \ 
+python evaluate_kitti.py --data_path $DATA_PATH(raw_data) --load_weights_folder $MODEL_PATH(dipe_eigen) \ 
 --eval_mono --eval_split eigen
 ```
 
 #### Official Benchmark Split
 
 ```
-python train.py --data_path $DATA_PATH(depth) --load_weights_folder $MODEL_PATH(dipe_bench) --dataset kitti_depth \ 
+python evaluate_kitti.py --data_path $DATA_PATH(depth) --load_weights_folder $MODEL_PATH(dipe_bench) --dataset kitti_depth \ 
 --eval_mono --eval_split benchmark
 ```
 
