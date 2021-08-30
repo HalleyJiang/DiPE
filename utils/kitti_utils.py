@@ -8,6 +8,7 @@
 # which allows for non-commercial use only, the full terms of which are made
 # available in the LICENSE file.
 
+
 from __future__ import absolute_import, division, print_function
 
 import os
@@ -154,3 +155,17 @@ def export_gt_depths(data_path, split):
     np.savez_compressed(output_path, data=gt_depths)
 
     return gt_depths
+
+
+def load_labels(split):
+
+    labels_folder = os.path.join(os.getcwd(), "splits", split, "labels")
+    labels_files = sorted(os.listdir(labels_folder))
+
+    labels = []
+    for file in labels_files:
+        label = np.asarray(pil.open(os.path.join(labels_folder, file)))
+        labels.append(label)
+
+    labels = np.array(labels)
+    return labels

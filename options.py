@@ -7,6 +7,7 @@
 # which allows for non-commercial use only, the full terms of which are made
 # available in the LICENSE file.
 
+
 from __future__ import absolute_import, division, print_function
 
 import os
@@ -38,8 +39,9 @@ class MonodepthOptions:
         self.parser.add_argument("--split",
                                  type=str,
                                  help="which training split to use",
-                                 choices=["eigen_zhou", "eigen", "odom", "benchmark"],
-                                 default="eigen_zhou")
+                                 choices=["kitti_eigen_zhou", "kitti_eigen", "kitti_odom", "kitti_benchmark",
+                                          "cityscapes"],
+                                 default="kitti_eigen_zhou")
         self.parser.add_argument("--num_layers",
                                  type=int,
                                  help="number of resnet layers",
@@ -49,7 +51,7 @@ class MonodepthOptions:
                                  type=str,
                                  help="dataset to train on",
                                  default="kitti",
-                                 choices=["kitti", "kitti_odom", "kitti_depth"])
+                                 choices=["kitti", "kitti_odom", "kitti_depth", "cityscapes"])
         self.parser.add_argument("--png",
                                  help="if set, trains from raw KITTI png files (instead of jpgs)",
                                  action="store_true")
@@ -130,7 +132,6 @@ class MonodepthOptions:
                                  help="if set, use full resolution multiscale",
                                  action="store_true")
 
-
         self.parser.add_argument("--disable_masking",
                                  help="if set, do not estimate masks for the photometric loss",
                                  action="store_true")
@@ -166,7 +167,6 @@ class MonodepthOptions:
                                  type=float,
                                  help="scale rate",
                                  default=0.25)
-
 
         # SYSTEM options
         self.parser.add_argument("--no_cuda",
@@ -217,9 +217,9 @@ class MonodepthOptions:
                                  help="optional path to a .npy disparities file to evaluate")
         self.parser.add_argument("--eval_split",
                                  type=str,
-                                 default="eigen",
-                                 choices=["eigen", "eigen_benchmark", "benchmark",
-                                          "odom_09", "odom_10"],
+                                 default="kitti_eigen",
+                                 choices=["kitti_eigen", "kitti_eigen_benchmark", "kitti_benchmark",
+                                          "kitti_odom_09", "kitti_odom_10"],
                                  help="which split to run eval on")
         self.parser.add_argument("--save_pred_disps",
                                  help="if set saves predicted disparities",
@@ -240,5 +240,11 @@ class MonodepthOptions:
                                  action="store_true")
 
     def parse(self):
+
         self.options = self.parser.parse_args()
+
+        if self.options.split == "cityscapes":
+            self.options.height = 192
+            self.options.width = 512
+
         return self.options

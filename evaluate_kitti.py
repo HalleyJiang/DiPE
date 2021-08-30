@@ -37,11 +37,11 @@ splits_dir = os.path.join(os.path.dirname(__file__), "splits")
 STEREO_SCALE_FACTOR = 5.4
 
 
-datasets_dict = {"eigen": datasets.KITTIRAWDataset,
-                 "eigen_benchmark": datasets.KITTIRAWDataset,
-                 "benchmark": datasets.KITTIDepthTestDataset,
-                 "odom_09": datasets.KITTIOdomDataset,
-                 "odom_10": datasets.KITTIOdomDataset}
+datasets_dict = {"kitti_eigen": datasets.KITTIRAWDataset,
+                 "kitti_eigen_benchmark": datasets.KITTIRAWDataset,
+                 "kitti_benchmark": datasets.KITTIDepthTestDataset,
+                 "kitti_odom_09": datasets.KITTIOdomDataset,
+                 "kitti_odom_10": datasets.KITTIOdomDataset}
 
 
 def evaluate_depth(opt):
@@ -116,7 +116,7 @@ def evaluate_depth(opt):
 
         pred_disps = np.concatenate(pred_disps)
 
-        if opt.eval_split == "benchmark":
+        if opt.eval_split == "kitti_benchmark":
             val_sel_filenames = readlines(os.path.join(splits_dir, opt.eval_split, "val_selection_files.txt"))
 
             val_sel_dataset = datasets_dict[opt.eval_split](opt.data_path, val_sel_filenames,
@@ -155,10 +155,10 @@ def evaluate_depth(opt):
 
         if opt.eval_eigen_to_benchmark:
             eigen_to_benchmark_ids = np.load(
-                os.path.join(splits_dir, "eigen_benchmark", "eigen_to_benchmark_ids.npy"))
+                os.path.join(splits_dir, "kitti_eigen_benchmark", "eigen_to_benchmark_ids.npy"))
             pred_disps = pred_disps[eigen_to_benchmark_ids]
 
-        if opt.eval_split == "benchmark":
+        if opt.eval_split == "kitti_benchmark":
             val_sel_pred_disps = np.load(os.path.join(opt.ext_disp_to_eval.split('/')[:-1] +
                                                       "val_sel_" + opt.ext_disp_to_eval.split('/')[-1]))
 
@@ -168,13 +168,13 @@ def evaluate_depth(opt):
         print("-> Saving predicted disparities to ", output_path)
         np.save(output_path, pred_disps)
 
-        if opt.eval_split == "benchmark":
+        if opt.eval_split == "kitti_benchmark":
             output_path = os.path.join(
                 opt.load_weights_folder, "val_sel_disps_{}_split.npy".format(opt.eval_split))
             print("-> Saving predicted disparities to ", output_path)
             np.save(output_path, val_sel_pred_disps)
 
-    if opt.eval_split == "benchmark":
+    if opt.eval_split == "kitti_benchmark":
         pred_disps_test_only = pred_disps
         pred_disps = val_sel_pred_disps
 
@@ -206,8 +206,8 @@ def evaluate_depth(opt):
         pred_disp = cv2.resize(pred_disp, (gt_width, gt_height))
         pred_depth = 1 / pred_disp
 
-        if opt.eval_split == "eigen" \
-                or opt.eval_split == "eigen_benchmark":
+        if opt.eval_split == "kitti_eigen" \
+                or opt.eval_split == "kitti_eigen_benchmark":
             mask = np.logical_and(gt_depth > MIN_DEPTH, gt_depth < MAX_DEPTH)
 
             crop = np.array([0.40810811 * gt_height, 0.99189189 * gt_height,
@@ -259,7 +259,7 @@ def evaluate_depth(opt):
     print("\n-> Done!", file=f)
     f.close()
 
-    if opt.eval_split == 'benchmark':
+    if opt.eval_split == 'kitti_benchmark':
         save_dir = os.path.join(opt.load_weights_folder, "benchmark_predictions")
         print("-> Saving out benchmark predictions to {}".format(save_dir))
 
@@ -281,7 +281,7 @@ def evaluate_pose(opt):
     assert os.path.isdir(opt.load_weights_folder), \
         "Cannot find a folder at {}".format(opt.load_weights_folder)
 
-    assert opt.eval_split == "odom_09" or opt.eval_split == "odom_10", \
+    assert opt.eval_split == "kitti_odom_09" or opt.eval_split == "kitti_odom_10", \
         "eval_split should be either odom_9 or odom_10"
 
     device = torch.device("cpu" if opt.no_cuda else "cuda")
@@ -292,13 +292,13 @@ def evaluate_pose(opt):
         opt.frame_ids = [1, 0]  # pose network only takes two frames as input
         num_poses = 1
         filenames = readlines(
-            os.path.join(os.path.dirname(__file__), "splits", "odom",
+            os.path.join(os.path.dirname(__file__), "splits", "kitti_odom",
                          "test_files_{}_{:02d}.txt".format("pairs", sequence_id)))
     else:
         opt.frame_ids = [i for i in opt.frame_ids if i != "s"]
         num_poses = len(opt.frame_ids) - 1
         filenames = readlines(
-            os.path.join(os.path.dirname(__file__), "splits", "odom",
+            os.path.join(os.path.dirname(__file__), "splits", "kitti_odom",
                          "test_files_{}_{:02d}.txt".format("all"+str(num_poses+1), sequence_id)))
 
     img_ext = '.png' if opt.png else '.jpg'
@@ -406,7 +406,7 @@ def evaluate_pose(opt):
 if __name__ == "__main__":
     options = MonodepthOptions()
     opt = options.parse()
-    if opt.eval_split in ["eigen", "eigen_benchmark", "benchmark"]:
+    if opt.eval_split in ["kitti_eigen", "kitti_eigen_benchmark", "kitti_benchmark"]:
         evaluate_depth(opt)
-    elif opt.eval_split in ["odom_09", "odom_10"]:
+    elif opt.eval_split in ["kitti_odom_09", "kitti_odom_10"]:
         evaluate_pose(opt)

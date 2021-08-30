@@ -97,6 +97,9 @@ class KITTIRAWDataset(KITTIDataset):
     def check_pose(self):
         return False
 
+    def check_object_mask(self):
+        return False
+
     def get_intrinsic(self, folder):
         date = folder.split('/')[0]
         return self.K[date]
@@ -164,6 +167,9 @@ class KITTIDepthDataset(KITTIDataset):
         return os.path.isfile(depth_filename)
 
     def check_pose(self):
+        return False
+
+    def check_object_mask(self):
         return False
 
     def get_intrinsic(self, folder):
@@ -249,6 +255,9 @@ class KITTIOdomDataset(KITTIDataset):
 
         return os.path.isfile(pose_filename)
 
+    def check_object_mask(self):
+        return False
+
     def get_intrinsic(self, folder):
         return self.K["{:02d}".format(int(folder))]
 
@@ -290,6 +299,9 @@ class KITTIDepthTestDataset(KITTIDataset):
         return False
 
     def check_pose(self):
+        return False
+
+    def check_object_mask(self):
         return False
 
     def get_image_path(self, folder, frame_index, side=None):

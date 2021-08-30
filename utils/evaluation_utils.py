@@ -6,6 +6,9 @@ import numpy as np
 def compute_errors(gt, pred):
     """Computation of error metrics between predicted and ground truth depths
     """
+    if gt.shape[0] == 0:
+        return np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan
+
     thresh = np.maximum((gt / pred), (pred / gt))
     a1 = (thresh < 1.25     ).mean()
     a2 = (thresh < 1.25 ** 2).mean()

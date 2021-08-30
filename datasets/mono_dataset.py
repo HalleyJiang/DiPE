@@ -14,11 +14,13 @@ import random
 import numpy as np
 import copy
 from PIL import Image  # using pillow-simd for increased speed
+from PIL import ImageFile
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 import torch
 import torch.utils.data as data
-import torchvision
 from torchvision import transforms
+import torchvision
 
 random.seed(10)
 np.random.seed(10)
@@ -74,8 +76,8 @@ class MonoDataset(data.Dataset):
         self.loader = pil_loader
         self.to_tensor = transforms.ToTensor()
 
-        # Need to specify augmentations differently in torchvision over 0.2.1
-        vs = torchvision.__version__.split('.')
+        # Need to specify augmentations differently in pytorch 1.0 compared with 0.4
+        vs = torchvision.__version__.split('+')[0].split('.')
         if int(vs[0])*100 + int(vs[1])*10 + int(vs[2]) > 21:
             self.brightness = (0.8, 1.2)
             self.contrast = (0.8, 1.2)
@@ -95,6 +97,7 @@ class MonoDataset(data.Dataset):
 
         self.load_depth = self.check_depth()
         self.load_pose = self.check_pose()
+        self.load_object_mask = self.check_object_mask()
 
     def preprocess(self, inputs, color_aug):
         """Resize colour images to the required scales and augment if required
@@ -201,13 +204,18 @@ class MonoDataset(data.Dataset):
             depth_gt = self.get_depth(folder, frame_index, side, do_flip)
             inputs[("depth_gt", 0)] = np.expand_dims(depth_gt, 0)
             inputs[("depth_gt", 0)] = torch.from_numpy(inputs[("depth_gt", 0)].astype(np.float32))
-
+			
         if self.load_pose:
             for i in self.frame_idxs:
                 if i != "s":
                     pose_gt = self.get_pose(folder, frame_index+i, do_flip)
                     inputs[("pose_gt", i)] = torch.from_numpy(pose_gt.astype(np.float32))
 
+        if self.load_object_mask:
+            object_mask = self.get_object_mask(folder, frame_index, side, do_flip)
+            inputs[("object_mask", 0)] = np.expand_dims(object_mask, 0)
+            inputs[("object_mask", 0)] = torch.from_numpy(inputs[("object_mask", 0)])
+		
         if "s" in self.frame_idxs:
             stereo_T = np.eye(4, dtype=np.float32)
             baseline_sign = -1 if do_flip else 1
@@ -234,4 +242,10 @@ class MonoDataset(data.Dataset):
         raise NotImplementedError
 
     def get_intrinsic(self, folder):
+        raise NotImplementedError
+
+    def check_object_mask(self):
+        raise NotImplementedError
+
+    def get_object_mask(self, folder, frame_index, side, do_flip):
         raise NotImplementedError

@@ -1,8 +1,5 @@
-# Copyright Niantic 2019. Patent Pending. All rights reserved.
-#
-# This software is licensed under the terms of the Monodepth2 licence
-# which allows for non-commercial use only, the full terms of which are made
-# available in the LICENSE file.
+# Based on the code of Monodepth2
+# https://github.com/nianticlabs/monodepth2/blob/master/networks/depth_decoder.py
 
 
 from __future__ import absolute_import, division, print_function

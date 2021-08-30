@@ -1,12 +1,12 @@
 # Based on the code of Monodepth2
 # https://github.com/nianticlabs/monodepth2/blob/master/trainer.py
 
-
 # Copyright Niantic 2019. Patent Pending. All rights reserved.
 #
 # This software is licensed under the terms of the Monodepth2 licence
 # which allows for non-commercial use only, the full terms of which are made
 # available in the LICENSE file.
+
 
 from __future__ import absolute_import, division, print_function
 
@@ -34,7 +34,9 @@ torch.cuda.manual_seed(10)
 
 datasets_dict = {"kitti": datasets.KITTIRAWDataset,
                  "kitti_odom": datasets.KITTIOdomDataset,
-                 "kitti_depth": datasets.KITTIDepthDataset}
+                 "kitti_depth": datasets.KITTIDepthDataset,
+                 "cityscapes": datasets.CityScapesDataset}
+
 
 class Trainer:
     def __init__(self, options):
@@ -360,8 +362,7 @@ class Trainer:
                         outputs[("sample", frame_id, scale)],
                         padding_mode="border")
 
-                if not self.opt.disable_masking and \
-                        not self.opt.disable_occlusion_mask_from_image_boundary:
+                if not self.opt.disable_masking and not self.opt.disable_occlusion_mask_from_image_boundary:
                     outputs[("occlusion_mask_from_image_boundary", frame_id, scale)] = (
                             (outputs[("sample", frame_id, scale)][..., 0].unsqueeze(1) >= -1) *
                             (outputs[("sample", frame_id, scale)][..., 0].unsqueeze(1) <= 1) *
@@ -613,6 +614,14 @@ class Trainer:
                 writer.add_image(
                     "disp_{}/{}".format(s, j),
                     normalize_image(outputs[("disp", 0, s)][j]), self.step)
+
+            if ("depth_gt", 0) in inputs:
+
+                depth = inputs[("depth_gt", 0)][j]
+                depth[depth == 0] = 1000000
+
+                writer.add_image("gt_disp/{}".format(j),
+                                 normalize_image(1 / (depth + 0.000001)), self.step)
 
     def save_opts(self):
         """Save options to disk so we know what we ran this experiment with
