@@ -85,7 +85,7 @@ python train.py --data_path $DATA_PATH(odometry) --model_name dipe_odom5 --split
 
 # Evaluation  
 
-The pretrained models of our paper is available on [GoogleDrive](https://drive.google.com/file/d/15HLlcknpEZ87WH1rdPHfe9c5KnyFAI4S/view) and [BaiduDisk](https://pan.baidu.com/s/17j4J4A8S4zgy836O5v3LDQ) (code:rq3a). 
+The pretrained models of our paper is available on [GoogleDrive](https://drive.google.com/file/d/15HLlcknpEZ87WH1rdPHfe9c5KnyFAI4S/view?usp=sharing) and [BaiduDisk](https://pan.baidu.com/s/17j4J4A8S4zgy836O5v3LDQ) (code:rq3a). 
 
 ### Monocular Depth
 
