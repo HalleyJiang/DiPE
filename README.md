@@ -231,9 +231,10 @@ Please cite our papers if you find our work useful in your research.
   year={2020}
 }
 @article{jiang2021unsupervised,
-  title={Unsupervised Monocular Depth Perception: Focusing on Moving Objects},
-  author={Jiang, Hualie and Ding, Laiyan and Sun, Zhenglong and Huang, Rui},
-  journal={arXiv preprint},
-  year={2021}
+	  title={Unsupervised Monocular Depth Perception: Focusing on Moving Objects},
+	  author={Jiang, Hualie and Ding, Laiyan and Sun, Zhenglong and Huang, Rui},
+	  journal={IEEE Sensors Journal},
+	  year={2021},
+	  publisher={IEEE}
 }
 ```
